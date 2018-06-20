@@ -1,42 +1,63 @@
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
+const unzpr = require('unzpr');
 const rimraf = require('rimraf');
+const rs = fs.createReadStream(path.join(__dirname, 'lib.zip'));
 
-const platform = os.platform();
-switch (platform) {
-  case 'win32': {
-    ['macos', 'linux', 'android', 'ios'].forEach(p => {
-      rimraf(path.join(__dirname, 'lib', p), err => {
-        if (err) {
-          throw err;
-        }
-      });
+rs.on('ready', () => {
+  const ws = rs.pipe(unzpr.Extract({
+    path: __dirname,
+  }));
+  ws.on('done', () => {
+    rimraf(path.join(__dirname, 'lib.zip'), err => {
+      if (err) {
+        throw err;
+      }
     });
-    break;
+    const platform = os.platform();
+    switch (platform) {
+      case 'win32': {
+        ['macos', 'linux'].forEach(p => {
+          rimraf(path.join(__dirname, 'lib', p), err => {
+            if (err) {
+              throw err;
+            }
+          });
+        });
+        break;
+      }
+      case 'darwin': {
+        ['win', 'linux'].forEach(p => {
+          rimraf(path.join(__dirname, 'lib', p), err => {
+            if (err) {
+              throw err;
+            }
+          });
+        });
+        break;
+      }
+      case 'linux': {
+        ['win', 'macos'].forEach(p => {
+          rimraf(path.join(__dirname, 'lib', p), err => {
+            if (err) {
+              throw err;
+            }
+          });
+        });
+        break;
+      }
+      default: throw new Error('unknown platform: ' + platform);
+    }
+  });
+});
+rs.on('error', err => {
+  if (err.code === 'ENOENT') {
+    process.exit(0);
+  } else {
+    throw err;
   }
-  case 'darwin': {
-    ['win', 'linux', 'android', 'ios'].forEach(p => {
-      rimraf(path.join(__dirname, 'lib', p), err => {
-        if (err) {
-          throw err;
-        }
-      });
-    });
-    break;
-  }
-  case 'linux': {
-    ['win', 'macos', 'android', 'ios'].forEach(p => {
-      rimraf(path.join(__dirname, 'lib', p), err => {
-        if (err) {
-          throw err;
-        }
-      });
-    });
-    break;
-  }
-  default: throw new Error('unknown platform: ' + platform);
-}
+});
 
 process.on('uncaughtException', err => {
   console.warn(err.stack);

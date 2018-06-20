@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/modulesio/wkth#readme",
   "dependencies": {
-    "rimraf": "^2.6.2"
+    "rimraf": "^2.6.2",
+    "unzpr": "0.0.3"
   }
 }

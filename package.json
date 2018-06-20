@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "postinstall": "node postinstall.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -15,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/modulesio/wkth/issues"
   },
-  "homepage": "https://github.com/modulesio/wkth#readme"
+  "homepage": "https://github.com/modulesio/wkth#readme",
+  "dependencies": {
+    "rimraf": "^2.6.2"
+  }
 }
